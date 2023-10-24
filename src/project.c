@@ -185,25 +185,33 @@ void play_game(void)
 		// Checkout the function comment in `buttons.h` and the implementation
 		// in `buttons.c`.
 		btn = button_pushed();
-		
-		if (btn == BUTTON0_PUSHED)
+
+		// Check for serial input
+		char serial_input = -1;
+		if (serial_input_available())
 		{
-			// If button 0 play the lowest note (right lane)
+			serial_input = fgetc(stdin);
+		}
+
+		// Play note based on input
+		if (btn == BUTTON0_PUSHED || serial_input == 'f' || serial_input == 'F')
+		{
+			// If button 0 or 'f'/'F' play the lowest note (right lane)
 			play_note(0);
 		}
-		if (btn == BUTTON1_PUSHED)
+		if (btn == BUTTON1_PUSHED || serial_input == 'd' || serial_input == 'D')
 		{
-			// If button 1 play the second lowest note (second from right lane)
+			// If button 1 or 'd'/'D' play the second lowest note (second from right lane)
 			play_note(1);
 		}
-		if (btn == BUTTON2_PUSHED)
+		if (btn == BUTTON2_PUSHED || serial_input == 's' || serial_input == 'S')
 		{
-			// If button 2 play the second highest note (second from left lane)
+			// If button 2 or 's'/'S' play the second highest note (second from left lane)
 			play_note(2);
 		}
-		if (btn == BUTTON3_PUSHED)
+		if (btn == BUTTON3_PUSHED || serial_input == 'a' || serial_input == 'A')
 		{
-			// If button 3 play the highest note (left lane)
+			// If button 3 or 'a'/'A' play the highest note (left lane)
 			play_note(3);
 		}
 		
