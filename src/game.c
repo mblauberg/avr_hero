@@ -85,20 +85,25 @@ void play_note(uint8_t lane)
 			// Check if note has been played
 			if (played_track[index] & (1<<lane))
 			{
+				score -= 1;
 				continue;
 			}
 			// Mark the note as played
 			played_track[index] |= (1<<lane);
-			// If so, colour the two pixels green
+			// Colour the two pixels green
 			ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
 			ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
 			// Award points
 			award_points(col);
 		}
+		else
+		{
+			score -= 1;
+		}
 	}
 }
 
-// Advance the notes one row down the display
+// Advance the notes oned row down the display
 void advance_note(void)
 {
 	// remove all the current notes; reverse of below
@@ -191,6 +196,7 @@ uint8_t is_game_over(void)
 	// Detect if the game is over i.e. if a player has won.
 	if (beat >= TRACK_LENGTH*5)
 	{
+		static uint8_t played_track[TRACK_LENGTH] = {0};
 		return 1;
 	}
 	return 0;

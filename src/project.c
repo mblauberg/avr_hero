@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -35,6 +36,7 @@ void play_game(void);
 void handle_game_over(void);
 
 uint16_t game_speed;
+bool manual_mode = false;
 
 /////////////////////////////// main //////////////////////////////////
 int main(void)
@@ -43,13 +45,10 @@ int main(void)
 	// interrupts.
 	initialise_hardware();
 	
-	// Show the splash screen message. Returns when display
-	// is complete.
-	start_screen();
-	
 	// Loop forever and continuously play the game.
 	while(1)
 	{
+		start_screen();
 		new_game();
 		play_game();
 		handle_game_over();
@@ -215,9 +214,29 @@ void play_game(void)
 			// If button 3 or 'a'/'A' play the highest note (left lane)
 			play_note(3);
 		}
+
+		// Check for serial manual mode input
+		if (serial_input == 'm' || serial_input == 'M')
+		{
+			// If 'm'/'M' is pressed, toggle manual mode
+			manual_mode = !manual_mode;
+			if (manual_mode)
+			{
+				// If manual mode is on, update the display
+				move_terminal_cursor(10,6);
+				printf_P(PSTR("MANUAL MODE ACTIVE"));
+			}
+			else
+			{
+				// If manual mode is off, update the display
+				move_terminal_cursor(10,6);
+				printf_P(PSTR("                   "));
+			}
+		}
 		
 		current_time = get_current_time();
-		if (current_time >= last_advance_time + game_speed/5)
+		if (current_time >= last_advance_time + game_speed/5 && 
+		(!manual_mode || (manual_mode && (serial_input == 'n' || serial_input == 'N'))))
 		{
 			// 200ms (0.2 second) has passed since the last time we advance the
 			// notes here, so update the advance the notes
