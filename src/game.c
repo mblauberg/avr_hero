@@ -32,8 +32,8 @@ static const uint8_t track[TRACK_LENGTH] = {0x00,
 	0x04, 0x40, 0x08, 0x04, 0x40, 0x40, 0x02, 0x20,
 	0x01, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00};
 
-static uint8_t played_note_lane, played_note_col;
-
+static uint8_t played_track[TRACK_LENGTH] = {0};
+uint16_t score;
 uint16_t beat;
 
 // Initialise the game by resetting the grid and beat
@@ -42,6 +42,23 @@ void initialise_game(void)
 	// initialise the display we are using.
 	default_grid();
 	beat = 0;
+}
+
+void award_points(uint8_t col)
+{
+	// award points based on the column
+	if (col == 11 || col == 15)
+	{
+		score += 1;
+	}
+	else if (col == 12 || col == 14)
+	{
+		score += 2;
+	}
+	else if (col == 13)
+	{
+		score += 3;
+	}
 }
 
 // Play a note in the given lane
@@ -62,18 +79,24 @@ void play_note(uint8_t lane)
 		{
 			continue;
 		}
-	// Check if there's a note in the specific path
-	if (track[index] & (1<<lane))
-	{
-		// If so, colour the two pixels red
-		ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
-		ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
-		played_note_lane = lane;
-		played_note_col = col;
-	}
+		// Check if there's a note in the lane
+		if (track[index] & (1<<lane))
+		{	
+			// Check if note has been played
+			if (played_track[index] & (1<<lane))
+			{
+				continue;
+			}
+			// Mark the note as played
+			played_track[index] |= (1<<lane);
+			// If so, colour the two pixels green
+			ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
+			ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
+			// Award points
+			award_points(col);
+		}
 	}
 }
-
 
 // Advance the notes one row down the display
 void advance_note(void)
@@ -121,8 +144,6 @@ void advance_note(void)
 	
 	// increment the beat
 	beat++;
-	// increment played note column
-	played_note_col++;
 
 	// draw the new notes
 	for (uint8_t col=0; col<MATRIX_NUM_COLUMNS; col++)
@@ -149,18 +170,16 @@ void advance_note(void)
 			// check if there's a note in the specific path
 			if (track[index] & (1<<lane))
 			{
-				// check if the note was played
-				if (played_note_col == col && played_note_lane == lane)
+				// check if note has been played
+				if (played_track[index] & (1<<lane))
 				{
 					ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
 					ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
+					continue;
 				}
-				// if so, colour the two pixels red
-				else
-				{
-					ledmatrix_update_pixel(col, 2*lane, COLOUR_RED);
-					ledmatrix_update_pixel(col, 2*lane+1, COLOUR_RED);
-				}
+				// colour the note's two pixels red if not played
+				ledmatrix_update_pixel(col, 2*lane, COLOUR_RED);
+				ledmatrix_update_pixel(col, 2*lane+1, COLOUR_RED);
 			}
 		}
 	}

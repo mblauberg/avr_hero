@@ -179,11 +179,12 @@ void play_game(void)
 	// We play the game until it's over
 	while (!is_game_over())
 	{
-				
-		// We need to check if any button has been pushed, this will be
-		// NO_BUTTON_PUSHED if no button has been pushed
-		// Checkout the function comment in `buttons.h` and the implementation
-		// in `buttons.c`.
+		// Update score on terminal
+		move_terminal_cursor(10,4);
+		printf_P(PSTR("Game Score: %3d"), score);
+
+
+		// Check for button push
 		btn = button_pushed();
 
 		// Check for serial input

@@ -16,8 +16,14 @@
 
 #define TRACK_LENGTH 129
 
+// Declare score variaable as external
+extern uint16_t score;
+
 // Initialise the game by resetting the grid and beat
 void initialise_game(void);
+
+// Award points
+void award_points(uint8_t col);
 
 // Play a note in the given lane
 void play_note(uint8_t lane);
