@@ -4,7 +4,7 @@
  * Main file
  *
  * Authors: Peter Sutton, Luke Kamols, Jarrod Bennett, Cody Burnett
- * Modified by <YOUR NAME HERE>
+ * Modified by Michael Blauberg
  */
 
 #include <stdio.h>
@@ -99,8 +99,15 @@ void start_screen(void)
 	move_terminal_cursor(10,12);
 	printf_P(PSTR(" \\$$   \\$$     \\$     \\$$   \\$$       \\$$   \\$$  \\$$$$$$$ \\$$        \\$$$$$$"));
 	move_terminal_cursor(10,14);
-	// change this to your name and student number; remove the chevrons <>
-	printf_P(PSTR("CSSE2010/7201 A2 by <YOUR NAME> - <YOUR STUDENT NUMBER>"));
+	// Name and student number;
+	printf_P(PSTR("CSSE2010/7201 A2 by Michael Blauberg - s4588982"));
+	
+	// Game speed
+	move_terminal_cursor(10,16);
+	printf_P(PSTR("Game speed: "));
+	// Selected track
+	move_terminal_cursor(10,17);
+	printf_P(PSTR("Track: "));
 	
 	// Output the static start screen and wait for a push button 
 	// to be pushed or a serial input of 's'
@@ -183,6 +190,21 @@ void play_game(void)
 		{
 			// If button 0 play the lowest note (right lane)
 			play_note(0);
+		}
+		if (btn == BUTTON1_PUSHED)
+		{
+			// If button 1 play the second lowest note (second from right lane)
+			play_note(1);
+		}
+		if (btn == BUTTON2_PUSHED)
+		{
+			// If button 2 play the second highest note (second from left lane)
+			play_note(2);
+		}
+		if (btn == BUTTON3_PUSHED)
+		{
+			// If button 3 play the highest note (left lane)
+			play_note(3);
 		}
 		
 		current_time = get_current_time();

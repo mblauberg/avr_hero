@@ -32,6 +32,8 @@ static const uint8_t track[TRACK_LENGTH] = {0x00,
 	0x04, 0x40, 0x08, 0x04, 0x40, 0x40, 0x02, 0x20,
 	0x01, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00};
 
+static uint8_t played_note_lane, played_note_col;
+
 uint16_t beat;
 
 // Initialise the game by resetting the grid and beat
@@ -44,10 +46,34 @@ void initialise_game(void)
 
 // Play a note in the given lane
 void play_note(uint8_t lane)
-{
-	// YOUR CODE HERE
-	// fill in this function to play the notes
+{	
+	// Change the value of lane so that they are ordered left to right
+	lane = 3 - lane;
+	// Check if there is a note in the scoring area
+	for (uint8_t col = 11; col < MATRIX_NUM_COLUMNS; col++) 
+	{
+		uint8_t future = MATRIX_NUM_COLUMNS - 1 - col;
+		uint8_t index = (future + beat) / 5;
+		if ((future+beat) % 5)
+		{
+			continue;
+		}
+		if (index >= TRACK_LENGTH)
+		{
+			continue;
+		}
+	// Check if there's a note in the specific path
+	if (track[index] & (1<<lane))
+	{
+		// If so, colour the two pixels red
+		ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
+		ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
+		played_note_lane = lane;
+		played_note_col = col;
+	}
+	}
 }
+
 
 // Advance the notes one row down the display
 void advance_note(void)
@@ -95,7 +121,9 @@ void advance_note(void)
 	
 	// increment the beat
 	beat++;
-	
+	// increment played note column
+	played_note_col++;
+
 	// draw the new notes
 	for (uint8_t col=0; col<MATRIX_NUM_COLUMNS; col++)
 	{
@@ -121,9 +149,18 @@ void advance_note(void)
 			// check if there's a note in the specific path
 			if (track[index] & (1<<lane))
 			{
+				// check if the note was played
+				if (played_note_col == col && played_note_lane == lane)
+				{
+					ledmatrix_update_pixel(col, 2*lane, COLOUR_GREEN);
+					ledmatrix_update_pixel(col, 2*lane+1, COLOUR_GREEN);
+				}
 				// if so, colour the two pixels red
-				ledmatrix_update_pixel(col, 2*lane, COLOUR_RED);
-				ledmatrix_update_pixel(col, 2*lane+1, COLOUR_RED);
+				else
+				{
+					ledmatrix_update_pixel(col, 2*lane, COLOUR_RED);
+					ledmatrix_update_pixel(col, 2*lane+1, COLOUR_RED);
+				}
 			}
 		}
 	}
