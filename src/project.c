@@ -102,13 +102,6 @@ void start_screen(void)
 	// Name and student number;
 	printf_P(PSTR("CSSE2010/7201 A2 by Michael Blauberg - s4588982"));
 	
-	// Game speed
-	move_terminal_cursor(10,16);
-	printf_P(PSTR("Game speed: "));
-	// Selected track
-	move_terminal_cursor(10,17);
-	printf_P(PSTR("Track: "));
-	
 	// Output the static start screen and wait for a push button 
 	// to be pushed or a serial input of 's'
 	show_start_screen();
@@ -118,6 +111,13 @@ void start_screen(void)
 	
 	uint8_t frame_number = 0;
 	game_speed = 1000;
+
+	// Game speed
+	move_terminal_cursor(10,16);
+	printf_P(PSTR("Game speed: %1d"), game_speed/100);
+	// Selected track
+	move_terminal_cursor(10,17);
+	printf_P(PSTR("Track: "));
 
 	// Wait until a button is pressed, or 's' is pressed on the terminal
 	while(1)
@@ -230,17 +230,32 @@ void play_game(void)
 	// We get here if the game is over.
 }
 
-void handle_game_over()
+void handle_game_over(void)
 {
 	move_terminal_cursor(10,14);
 	printf_P(PSTR("GAME OVER"));
 	move_terminal_cursor(10,15);
 	printf_P(PSTR("Press a button or 's'/'S' to start a new game"));
 	
-	// Do nothing until a button is pushed. Hint: 's'/'S' should also start a
-	// new game
-	while (button_pushed() == NO_BUTTON_PUSHED)
+	// Do nothing until a button or 's'/'S' is pushed.
+	while(1)
 	{
-		; // wait
+		// Check for serial input
+		char serial_input = -1;
+		if (serial_input_available())
+		{
+			serial_input = fgetc(stdin);
+		}
+		// If the serial input is 's', then exit the end screen
+		if (serial_input == 's' || serial_input == 'S')
+		{
+			break;
+		}
+		// Next check for any button presses
+		int8_t btn = button_pushed();
+		if (btn != NO_BUTTON_PUSHED)
+		{
+			break;
+		}
 	}
 }

@@ -188,7 +188,10 @@ void advance_note(void)
 // Returns 1 if the game is over, 0 otherwise.
 uint8_t is_game_over(void)
 {
-	// YOUR CODE HERE
 	// Detect if the game is over i.e. if a player has won.
+	if (beat >= TRACK_LENGTH*5)
+	{
+		return 1;
+	}
 	return 0;
 }
