@@ -20,6 +20,9 @@ void show_start_screen(void);
 // Update dynamic start screen based on frame number (0-11)
 void update_start_screen(uint8_t frame_number);
 
+// Display countdown timer
+void display_countdown(uint8_t timer);
+
 // Updates the colour at square (x, y) to be the colour
 // of the object 'object'.
 void update_square_colour(uint8_t x, uint8_t y, uint8_t object);

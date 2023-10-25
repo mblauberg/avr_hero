@@ -158,6 +158,22 @@ void new_game(void)
 	// Clear the serial terminal
 	clear_terminal();
 	
+	// Display countdown
+	uint32_t last_screen_update, current_time;
+	last_screen_update = get_current_time();
+	
+	uint8_t timer = 0;
+	while (timer < 5)
+	{
+		current_time = get_current_time();
+		if (current_time >= last_screen_update + game_speed*2/5)
+		{
+			display_countdown(game_speed, timer);
+			last_screen_update = current_time;
+			timer++;
+		}
+	}
+
 	// Initialise the game and display
 	initialise_game();
 	
