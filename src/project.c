@@ -108,16 +108,17 @@ void start_screen(void)
 	uint32_t last_screen_update, current_time;
 	last_screen_update = get_current_time();
 	
-	uint8_t frame_number = 0;
 	game_speed = 1000;
-
-	// Game speed
+	// Set normal game speed
 	move_terminal_cursor(10,16);
-	printf_P(PSTR("Game speed: %1d"), game_speed/100);
+	printf_P(PSTR("Game Speed: Normal Speed"));
+
+
 	// Selected track
 	move_terminal_cursor(10,17);
 	printf_P(PSTR("Track: "));
 
+	uint8_t frame_number = 0;
 	// Wait until a button is pressed, or 's' is pressed on the terminal
 	while(1)
 	{
@@ -140,6 +141,26 @@ void start_screen(void)
 		if (btn != NO_BUTTON_PUSHED)
 		{
 			break;
+		}
+
+		// Check for speed change from serial input
+		if (serial_input == '1')
+		{
+			game_speed = 1000;
+			move_terminal_cursor(10,16);
+			printf_P(PSTR("Game Speed: Normal Speed  "));
+		}
+		if (serial_input == '2')
+		{
+			game_speed = 500;
+			move_terminal_cursor(10,16);
+			printf_P(PSTR("Game Speed: Fast Speed    "));
+		}
+		if (serial_input == '3')
+		{
+			game_speed = 250;
+			move_terminal_cursor(10,16);
+			printf_P(PSTR("Game Speed: Extreme Speed "));
 		}
 
 		// every 200 ms, update the animation
@@ -168,7 +189,7 @@ void new_game(void)
 		current_time = get_current_time();
 		if (current_time >= last_screen_update + game_speed*2/5)
 		{
-			display_countdown(game_speed, timer);
+			display_countdown(timer);
 			last_screen_update = current_time;
 			timer++;
 		}
@@ -195,7 +216,7 @@ void play_game(void)
 	while (!is_game_over())
 	{
 		// Update score on terminal
-		move_terminal_cursor(10,4);
+		move_terminal_cursor(10,6);
 		printf_P(PSTR("Game Score: %3d"), score);
 
 
@@ -239,13 +260,13 @@ void play_game(void)
 			if (manual_mode)
 			{
 				// If manual mode is on, update the display
-				move_terminal_cursor(10,6);
+				move_terminal_cursor(10,4);
 				printf_P(PSTR("MANUAL MODE ACTIVE"));
 			}
 			else
 			{
 				// If manual mode is off, update the display
-				move_terminal_cursor(10,6);
+				move_terminal_cursor(10,4);
 				printf_P(PSTR("                   "));
 			}
 		}
